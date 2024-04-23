@@ -1,5 +1,6 @@
 let apiUrl = 'https://icanhazdadjoke.com/';
 let dadJoke = document.getElementById('dadJoke');
+let dadJokeImg = document.getElementById('dadJokeImg');
 
 // ------------------------------------------------------------------------------------Start of------------------------------------------------------------------------------------------- //
 // ----------------------------------------------------------------------------------API Functions---------------------------------------------------------------------------------------- //
@@ -20,6 +21,9 @@ async function randomDadJoke() {
         const data = await response.json(); // Parse the JSON data
         console.log(data);
         dadJoke.innerText = data.joke;
+        let imgID = data.id;
+        let imgSrc = `https://icanhazdadjoke.com/j/${imgID}.png`;
+        dadJokeImg.src = imgSrc;
 
     } catch (error) {
         console.error('Error fetching API data:', error);
