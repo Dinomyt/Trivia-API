@@ -1,48 +1,50 @@
-let apiUrl = 'https://icanhazdadjoke.com/';
-// let dadJoke = document.getElementById('dadJoke');
-let dadJokeImg = document.getElementById('dadJokeImg');
+let currentQuestionIndex = 0;
+let triviaQuestions = [];
 
-// ------------------------------------------------------------------------------------Start of------------------------------------------------------------------------------------------- //
-// ----------------------------------------------------------------------------------API Functions---------------------------------------------------------------------------------------- //
+async function fetchTriviaQuestions() {
+    const category = document.getElementById("categoryDropdown").value;
+    const apiUrl = `https://opentdb.com/api.php?amount=5&category=${category}&type=boolean`;
 
-async function randomDadJoke() {
-    console.log("Ran the function randomDadJoke()");
     try {
         const response = await fetch(apiUrl, {
             headers: {
-                'Accept': 'application/json' // Ensure correct response format
+                'Accept': 'application/json'
             }
         });
 
-        if (!response.ok) { // Check for HTTP errors
+        if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const data = await response.json(); // Parse the JSON data
-        console.log(data);
-        // dadJoke.innerText = data.joke;
-        let imgID = data.id;
-        let imgSrc = `https://icanhazdadjoke.com/j/${imgID}.png`;
-        dadJokeImg.src = imgSrc;
+        const data = await response.json();
+        triviaQuestions = data.results;
+        currentQuestionIndex = 0;
 
+        showNextQuestion();
     } catch (error) {
-        console.error('Error fetching API data:', error);
-        dadJoke.innerText = 'Error fetching joke. Try again later.'; // Display error message to the user
+        console.error('Error fetching trivia questions:', error);
     }
 }
 
-// -------------------------------------------------------------------------------------End of-------------------------------------------------------------------------------------------- //
-// ----------------------------------------------------------------------------------API Functions---------------------------------------------------------------------------------------- //
+function showNextQuestion() {
+    if (currentQuestionIndex >= triviaQuestions.length) {
+        document.getElementById("triviaDisplay").textContent = "No more questions!";
+        return;
+    }
 
+    const question = triviaQuestions[currentQuestionIndex];
+    document.getElementById("triviaQuestion").innerHTML = question.question; // Keep original HTML
+}
 
+function checkAnswer(answer) {
+    const correctAnswer = triviaQuestions[currentQuestionIndex].correct_answer;
+    const isCorrect = (correctAnswer === answer);
 
+    const feedbackElement = document.getElementById("triviaFeedback");
+    feedbackElement.textContent = isCorrect ? "Correct!" : "Incorrect!";
+    feedbackElement.style.color = isCorrect ? "green" : "red";
 
-// ------------------------------------------------------------------------------------Start of-------------------------------------------------------------------------------------------- //
-// ---------------------------------------------------------------------------------Event Listeners---------------------------------------------------------------------------------------- //
-
-document.getElementById("generateDadJokeBtn").addEventListener("click", function() {
-    randomDadJoke();
-});
-
-// -------------------------------------------------------------------------------------End of--------------------------------------------------------------------------------------------- //
-// ---------------------------------------------------------------------------------Event Listeners---------------------------------------------------------------------------------------- //
+    // Move to the next question
+    currentQuestionIndex++;
+    showNextQuestion();
+}
